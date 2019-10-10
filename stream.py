@@ -36,7 +36,7 @@ class Listener(StreamListener):
 
 			global tweetNum
 			tweetNum += 1
-			if tweetNum % 1000 == 0:
+			if tweetNum % 5000 == 0:
 				print(str(tweetNum) + " tweets collected.")
 				logging.info(str(tweetNum) + " tweets collected.")
 		except Exception as e:
@@ -105,11 +105,11 @@ last_err = time.time() - 7200
 last_disc = time.time() - 7200
 
 
-def recursive_streaming(tags):
+def recursive_streaming(tags,follow):
 	try:
 		print('Start streaming.')
-		logging.info('Start streaming with filters: ' + str(PARAMS['track']))
-		streamer.filter(follow = None, track = tags, encoding = 'utf8', filter_level = None, stall_warnings = True)
+		logging.info('Start streaming with filters: ' + str(PARAMS['track']) + ', and following users: ' + str(PARAMS['follow']))
+		streamer.filter(follow = follow, track = tags, encoding = 'utf8', filter_level = None, stall_warnings = True)
 	except KeyboardInterrupt:
 		print('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
 		logging.info('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
@@ -127,4 +127,4 @@ def recursive_streaming(tags):
 		time.sleep(disconnects)
 		recursive_streaming(tags)
 
-recursive_streaming(tags = PARAMS['track'])
+recursive_streaming(tags = PARAMS['track'], follow = PARAMS['follow'])
