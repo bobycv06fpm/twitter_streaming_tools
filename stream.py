@@ -105,7 +105,7 @@ last_err = time.time() - 7200
 last_disc = time.time() - 7200
 
 
-def recursive_streaming(tags,follow):
+def recursive_streaming(tags, follow):
 	try:
 		print('Start streaming.')
 		logging.info('Start streaming with filters: ' + str(PARAMS['track']) + ', and following users: ' + str(PARAMS['follow']))
@@ -125,6 +125,6 @@ def recursive_streaming(tags,follow):
 		print("Stream stopped. Waiting " + str(disconnects) + " seconds before restarting.")
 		logging.exception("Stream stopped. Waiting " + str(disconnects) + " seconds before restarting.")
 		time.sleep(disconnects)
-		recursive_streaming(tags)
+		recursive_streaming(tags, follow)
 
 recursive_streaming(tags = PARAMS['track'], follow = PARAMS['follow'])
