@@ -1,29 +1,18 @@
 # Preparation
 import os, time, logging
+import configparser
 from tweepy import OAuthHandler, Stream, StreamListener, API
 
 # Parameters and authentication
-PARAMS = {}
-CREDS = {}
+PARAMS = configparser.ConfigParser()
+PARAMS.read('config.ini')
 
-with open('params.txt', encoding = 'utf-8') as params:
-	for line in params:
-		param, value = line.strip().split(':', 1)
-		PARAMS[param] = value.split(';')
-		
-with open('auth.txt', encoding = 'utf-8') as creds:
-	for line in creds:
-		creds, value = line.strip().split(':', 1)
-		CREDS[creds] = value
-        
-OUTFILE = PARAMS['output'][0]
-
-# Set up logging
-logging.basicConfig(filename = PARAMS['log'][0], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
+# Setting up logging
+logging.basicConfig(filename = PARAMS['DEFAULT']['log'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
 
 # Authentication
-auth = OAuthHandler(CREDS['consumer_key'], CREDS['consumer_secret'])
-auth.set_access_token(CREDS['access_token'], CREDS['access_token_secret'])
+auth = OAuthHandler(PARAMS['credentials']['consumer_key'], PARAMS['credentials']['consumer_secret'])
+auth.set_access_token(PARAMS['credentials']['access_token'], PARAMS['credentials']['access_token_secret'])
 api = API(auth, wait_on_rate_limit = True, wait_on_rate_limit_notify = True)
 
 # Defining listener
@@ -31,9 +20,8 @@ class Listener(StreamListener):
 	# Actual tweet content
 	def on_data(self, tweet):
 		try:
-			with open(OUTFILE, 'a', encoding='utf-8', newline = '') as outfile:
+			with open(PARAMS['DEFAULT']['output'], 'a', encoding='utf-8', newline = '') as outfile:
 				outfile.write(tweet)
-
 			global tweetNum
 			tweetNum += 1
 			if tweetNum % 5000 == 0:
@@ -105,11 +93,15 @@ last_err = time.time() - 7200
 last_disc = time.time() - 7200
 
 
-def recursive_streaming(tags, follow):
+def recursive_streaming(tags, follow, lang):
 	try:
 		print('Start streaming.')
-		logging.info('Start streaming with filters: ' + str(PARAMS['track']) + ', and following users: ' + str(PARAMS['follow']))
-		streamer.filter(follow = follow, track = tags, encoding = 'utf8', filter_level = None, stall_warnings = True)
+		if PARAMS['DEFAULT']['mode'] == 'filter':
+			logging.info('Start streaming with filters: ' + str(PARAMS['filter']['track']) + ', and following users: ' + str(PARAMS['filter']['follow']))
+			streamer.filter(follow = follow, track = tags, encoding = 'utf8', filter_level = None, stall_warnings = True)
+		if PARAMS['DEFAULT']['mode'] == 'sample':
+			logging.info('Start sample streaming: ' + str(PARAMS['sample']['lang']))
+			streamer.sample(languages = lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
 	except KeyboardInterrupt:
 		print('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
 		logging.info('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
@@ -127,4 +119,4 @@ def recursive_streaming(tags, follow):
 		time.sleep(disconnects)
 		recursive_streaming(tags, follow)
 
-recursive_streaming(tags = PARAMS['track'], follow = PARAMS['follow'])
+recursive_streaming(tags = PARAMS['filter']['track'].split(','), follow = PARAMS['filter']['follow'].split(','), lang = PARAMS['sample']['lang'].split(','))
