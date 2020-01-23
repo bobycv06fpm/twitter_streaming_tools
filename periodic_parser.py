@@ -1,14 +1,22 @@
 # Preparation
 import json
+import configparser
 from datetime import date, timedelta
 from collections import Counter
 
-PARAMS = {}
+PARAMS = configparser.ConfigParser()
+PARAMS.read('config.ini')
 
-with open('params.txt', encoding = 'utf-8') as params:
-	for line in params:
-		param, value = line.strip().split(':', 1)
-		PARAMS[param] = value.split(';')
+# Setting up log file
+logging.basicConfig(filename = PARAMS['DEFAULT']['log'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
+
+##
+#PARAMS = {}
+#
+#with open('params.txt', encoding = 'utf-8') as params:
+#	for line in params:
+#		param, value = line.strip().split(':', 1)
+#		PARAMS[param] = value.split(';')
 
 # Get Date
 def getdate(offset = 0):
@@ -20,7 +28,7 @@ def getdate(offset = 0):
 def file2text():
 	texts = []
 	i = 0
-	with open(PARAMS['output'][0], 'r', encoding = 'utf-8-sig') as read_file:
+	with open(PARAMS['DEFAULT']['output'], 'r', encoding = 'utf-8-sig') as read_file:
 		for x in read_file:
 			i += 1
 			try:
@@ -28,7 +36,6 @@ def file2text():
 				if 'user' in data and 'retweeted_status' not in data:
 					text = parsetweet(data)
 					text_cleaned = cleantext(text)
-					
 					texts.append(text_cleaned)
 			except Exception as e: 
 				logging.exception('Error in entry:' + str(i))
