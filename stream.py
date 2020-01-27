@@ -94,10 +94,10 @@ last_disc = time.time() - 7200
 
 
 def recursive_streaming(tags = None, follow = None, sample_lang = None, filter_lang = None):
-	if tags = ['']: tags = None
-	if follow = ['']: follow = None
-	if sample_lang = ['']: sample_lang = None
-	if filter_lang = ['']: filter_lang = None
+	if tags == ['']: tags = None
+	if follow == ['']: follow = None
+	if sample_lang == ['']: sample_lang = None
+	if filter_lang == ['']: filter_lang = None
 	try:
 		print('Start streaming.')
 		if PARAMS['DEFAULT']['mode'] == 'filter':
