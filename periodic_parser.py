@@ -1,22 +1,15 @@
 # Preparation
-import json
+import json, logging, re
 import configparser
 from datetime import date, timedelta
 from collections import Counter
+from nltk.corpus import stopwords 
 
 PARAMS = configparser.ConfigParser()
 PARAMS.read('config.ini')
 
 # Setting up log file
-logging.basicConfig(filename = PARAMS['DEFAULT']['log'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
-
-##
-#PARAMS = {}
-#
-#with open('params.txt', encoding = 'utf-8') as params:
-#	for line in params:
-#		param, value = line.strip().split(':', 1)
-#		PARAMS[param] = value.split(';')
+logging.basicConfig(filename = PARAMS['DEFAULT']['parselog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
 
 # Get Date
 def getdate(offset = 0):
@@ -25,10 +18,10 @@ def getdate(offset = 0):
 	return datelabel
 
 # Read data from previous date
-def file2text():
+def file2text(infiles):
 	texts = []
 	i = 0
-	with open(PARAMS['DEFAULT']['output'], 'r', encoding = 'utf-8-sig') as read_file:
+	with open(infiles, 'r', encoding = 'utf-8-sig') as read_file:
 		for x in read_file:
 			i += 1
 			try:
@@ -51,26 +44,32 @@ def parsetweet(tweet):
 
 # remove punctuations
 def removepuncs(text):
-	puncs = '!"$%&\'()*+,-./:;<=>?[\\]^_`{|}~‘’'
+	puncs = '!"$%&\'()*+,-./:;<=>?[\\]^_`{|}~‘’“”—'
 	text = [word.strip(puncs) for word in text]
 	return text	
-	
+
 # Cleaning texts
-def cleantext(text):
+def cleantext(text, remove_stopwords = True):
 	text = text.lower() # lower cases
 	text = re.sub(r"http\S+", "", text) # remove http urls
 	text = text.split() # split by whitespace
 	text = removepuncs(text) # remove punctuations (but keep '#' and '@'; note that usernames ending in _ will be wrong)
-	text = [word for word in removepuncs(text) if word != ''] # remove '' (introduced by removepuncs)
+	if remove_stopwords:
+		stop_words = set(stopwords.words('english'))
+		stop_words.add('') # adding '' to be removed because it is introduced by removepuncs()
+		text = [word for word in text if word not in stop_words] # remove stopwords
+	else:
+		text = [word for word in text if word != '']
 	return text
 
-# Clean and flatten texts
+# Flatten texts
 def totextlist(texts, subset = False):
-	cleaned = [cleantext(text) for text in texts]
 	if subset != False:
-		cleaned = [words for words in cleaned if not set(words).isdisjoint(subset)]
-	textlist = [word for words in cleaned for word in words]
+		texts = [words for words in texts if not set(words).isdisjoint(subset)]
+	textlist = [word for words in texts for word in words]
 	return textlist
+
+# Count word frequencies
 
 
 
