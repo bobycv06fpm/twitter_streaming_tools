@@ -73,8 +73,11 @@ def totextlist(texts, subset = False):
 
 # Normalize frequency of one text list by another
 def normalize_counts(adjust, base, threshold, top = False):
-	adjust = Counter(adjust)	
-	base = Counter(base)
+	if isinstance(adjust, list):
+		adjust = Counter(adjust)
+	if isinstance(base, list):
+		base = Counter(base)
+
 	adjusted = dict()
 	for s in adjust:
 		if adjust[s] > threshold:
@@ -86,12 +89,6 @@ def normalize_counts(adjust, base, threshold, top = False):
 	if top != False:
 		adjusted = adjusted[0:top]
 	return adjusted
-
-# Normalize counts
-#def normalizecounts():
-#	f
-	
-# Return list of words
 
 # Writing the updated list of words to csv
 def updatecsv(wordlist, file = PARAMS['DEFAULT']['updated_wordlist']):
