@@ -1,9 +1,11 @@
 # Preparation
-import json, logging, re
+import json, logging, re, csv
 import configparser
 from datetime import date, timedelta
-from collections import Counter
+from collections import Counter, OrderedDict
+from operator import itemgetter
 from nltk.corpus import stopwords 
+import os.path
 
 PARAMS = configparser.ConfigParser()
 PARAMS.read('config.ini')
@@ -62,23 +64,47 @@ def cleantext(text, remove_stopwords = True):
 		text = [word for word in text if word != '']
 	return text
 
-# Flatten texts
+# Flatten texts; subset should be False or a list of text strings
 def totextlist(texts, subset = False):
 	if subset != False:
 		texts = [words for words in texts if not set(words).isdisjoint(subset)]
 	textlist = [word for words in texts for word in words]
 	return textlist
 
-# Count word frequencies
-
-
+# Normalize frequency of one text list by another
+def normalize_counts(adjust, base, threshold, top = False):
+	adjust = Counter(adjust)	
+	base = Counter(base)
+	adjusted = dict()
+	for s in adjust:
+		if adjust[s] > threshold:
+			if base[s] == 0:
+				base[s] = 1
+			adjusted[s] = adjust[s]/base[s]
+	
+	adjusted = sorted(adjusted.items(), key = itemgetter(1), reverse = True)
+	if top != False:
+		adjusted = adjusted[0:top]
+	return adjusted
 
 # Normalize counts
 #def normalizecounts():
 #	f
 	
 # Return list of words
-	
+
+# Writing the updated list of words to csv
+def updatecsv(wordlist, file = PARAMS['DEFAULT']['updated_wordlist']):
+	if not os.path.isfile(file):
+		with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
+			writer = csv.writer(out_file)
+			writer.writerow(['string', 'score', 'date'])
+	d = getdate()
+	with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
+		writer = csv.writer(out_file)
+		for row in wordlist:
+			writer.writerow(row + (d,))
+
 # Writing parameters file
 def paramsout(track, follow):
 	datelabel = getdate()
