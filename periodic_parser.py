@@ -1,11 +1,10 @@
 # Preparation
-import json, logging, re, csv
-import configparser
+import json, logging, re, csv, configparser
+import os.path
 from datetime import date, timedelta
 from collections import Counter, OrderedDict
 from operator import itemgetter
 from nltk.corpus import stopwords 
-import os.path
 
 PARAMS = configparser.ConfigParser()
 PARAMS.read('config.ini')
@@ -103,10 +102,12 @@ def updatecsv(wordlist, file = PARAMS['DEFAULT']['updated_wordlist']):
 			writer.writerow(row + (datelabel,))
 
 # Updating parameters file
-def paramsout(new_track, config = 'config.ini'):
+def paramsout(new_track, old_config = 'config.ini', new_config = None):
+	if new_config == None:
+		new_config = old_config
 	# Read in config file again
 	PARAMS = configparser.ConfigParser()
-	PARAMS.read(config)
+	PARAMS.read(old_config)
 	
 	datelabel = getdate()
 	spaced_comma = ', '
@@ -127,7 +128,7 @@ def paramsout(new_track, config = 'config.ini'):
 	PARAMS['DEFAULT']['rawjson'] = output
 	PARAMS['DEFAULT']['streamlog'] = log
 	
-	with open('config_test.ini', 'w') as configfile:
+	with open(new_config, 'w') as configfile:
 		PARAMS.write(configfile)
 
 #
