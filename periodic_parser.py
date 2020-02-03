@@ -96,21 +96,38 @@ def updatecsv(wordlist, file = PARAMS['DEFAULT']['updated_wordlist']):
 		with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
 			writer = csv.writer(out_file)
 			writer.writerow(['string', 'score', 'date'])
-	d = getdate()
+	datelabel = getdate()
 	with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
 		writer = csv.writer(out_file)
 		for row in wordlist:
-			writer.writerow(row + (d,))
+			writer.writerow(row + (datelabel,))
 
-# Writing parameters file
-def paramsout(track, follow):
+# Updating parameters file
+def paramsout(new_track, config = 'config.ini'):
+	# Read in config file again
+	PARAMS = configparser.ConfigParser()
+	PARAMS.read(config)
+	
 	datelabel = getdate()
-	semicolon = ';'
-	output = 'output:tweets_' + datelabel + '.txt\n'
-	log = 'log:log_' + datelabel + '.log\n'
-	tracks = 'track:' + semicolon.join(track) + '\n'
-	follows = 'follow:' + semicolon.join(follow)
-	with open('params.txt', 'w', encoding = 'utf-8', newline = '') as outfile:
-		outfile.writelines([output, log, tracks, follows])
+	spaced_comma = ', '
+	
+	# Format new tracks and combine with base tracks
+	new_track = [x[0] for x in new_track]
+	track_base = PARAMS['filter']['track_base'].split(spaced_comma)
+	new_track.extend(track_base)
+	new_track = list(set(new_track))
+	new_track = spaced_comma.join(new_track)	
+	
+	# Updating output files
+	output = 'tweets_' + datelabel + '.txt'
+	log = 'streamlog_' + datelabel + '.log'
+	
+	# Rewriting config file
+	PARAMS['filter']['track'] = new_track
+	PARAMS['DEFAULT']['rawjson'] = output
+	PARAMS['DEFAULT']['streamlog'] = log
+	
+	with open('config_test.ini', 'w') as configfile:
+		PARAMS.write(configfile)
 
 #

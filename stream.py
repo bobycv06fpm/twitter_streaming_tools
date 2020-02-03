@@ -123,4 +123,4 @@ def recursive_streaming(tags = None, follow = None, sample_lang = None, filter_l
 		time.sleep(disconnects)
 		recursive_streaming(tags, follow, sample_lang, filter_lang)
 
-recursive_streaming(tags = PARAMS['filter']['track'].split(','), follow = PARAMS['filter']['follow'].split(','), sample_lang = PARAMS['sample']['lang'].split(','), filter_lang = PARAMS['filter']['lang'].split(','))
+recursive_streaming(tags = PARAMS['filter']['track'].split(', '), follow = PARAMS['filter']['follow'].split(', '), sample_lang = PARAMS['sample']['lang'].split(', '), filter_lang = PARAMS['filter']['lang'].split(', '))
