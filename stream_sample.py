@@ -98,7 +98,7 @@ def recursive_streaming(lang = None):
 	try:
 		print('Start streaming.')
 		logging.info('Start sample streaming. (' + str(PARAMS['sample']['lang']) + ')')
-		streamer.sample(languages = lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
+		streamer.sample(languages = lang, stall_warnings = True)
 	except KeyboardInterrupt:
 		print('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
 		logging.info('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
