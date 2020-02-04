@@ -20,11 +20,11 @@ class Listener(StreamListener):
 	# Actual tweet content
 	def on_data(self, tweet):
 		try:
-			with open(PARAMS['sample']['rawjson'], 'a', encoding='utf-8', newline = '') as outfile:
+			with open(PARAMS['sample']['rawjson'], 'a', encoding = 'utf-8', newline = '') as outfile:
 				outfile.write(tweet)
 			global tweetNum
 			tweetNum += 1
-			if tweetNum % PARAMS['default']['update_freq'] == 0:
+			if tweetNum % int(PARAMS['default']['update_freq']) == 0:
 				print(str(tweetNum) + " tweets collected.")
 				logging.info(str(tweetNum) + " tweets collected.")
 		except Exception as e:
