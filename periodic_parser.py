@@ -12,7 +12,7 @@ def getdate(offset = 0):
 	datelabel = today.strftime("%Y%m%d")
 	return datelabel
 
-# Read data from previous date
+# Read data from file
 def file2text(infiles):
 	texts = []
 	i = 0
@@ -63,6 +63,12 @@ def totextlist(texts, subset = False):
 		texts = [words for words in texts if not set(words).isdisjoint(subset)]
 	textlist = [word for words in texts for word in words]
 	return textlist
+
+# Save counting dict as pickle
+def count_out(textlist, outfile):
+	textlist = Counter(textlist)
+	with open(outfile, 'wb') as out_pickle:
+				pickle.dump(textlist, out_pickle)
 
 # Normalize frequency of one text list by another
 def normalize_counts(adjust, base, threshold, top = False):
