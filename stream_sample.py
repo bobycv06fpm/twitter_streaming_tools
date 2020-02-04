@@ -11,8 +11,8 @@ PARAMS.read('config.ini')
 logging.basicConfig(filename = PARAMS['sample']['streamlog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
 
 # Authentication
-auth = OAuthHandler(PARAMS['credentials']['consumer_key'], PARAMS['credentials']['consumer_secret'])
-auth.set_access_token(PARAMS['credentials']['access_token'], PARAMS['credentials']['access_token_secret'])
+auth = OAuthHandler(PARAMS['sample']['consumer_key'], PARAMS['sample']['consumer_secret'])
+auth.set_access_token(PARAMS['sample']['access_token'], PARAMS['sample']['access_token_secret'])
 api = API(auth, wait_on_rate_limit = True, wait_on_rate_limit_notify = True)
 
 # Defining listener
