@@ -8,7 +8,7 @@ PARAMS = configparser.ConfigParser()
 PARAMS.read('config.ini')
 
 # Setting up logging
-logging.basicConfig(filename = PARAMS['DEFAULT']['streamlog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
+logging.basicConfig(filename = PARAMS['filter']['streamlog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
 
 # Authentication
 auth = OAuthHandler(PARAMS['credentials']['consumer_key'], PARAMS['credentials']['consumer_secret'])
@@ -20,11 +20,11 @@ class Listener(StreamListener):
 	# Actual tweet content
 	def on_data(self, tweet):
 		try:
-			with open(PARAMS['DEFAULT']['rawjson'], 'a', encoding='utf-8', newline = '') as outfile:
+			with open(PARAMS['filter']['rawjson'], 'a', encoding='utf-8', newline = '') as outfile:
 				outfile.write(tweet)
 			global tweetNum
 			tweetNum += 1
-			if tweetNum % 5000 == 0:
+			if tweetNum % PARAMS['default']['update_freq'] == 0:
 				print(str(tweetNum) + " tweets collected.")
 				logging.info(str(tweetNum) + " tweets collected.")
 		except Exception as e:
@@ -93,19 +93,14 @@ last_err = time.time() - 7200
 last_disc = time.time() - 7200
 
 
-def recursive_streaming(tags = None, follow = None, sample_lang = None, filter_lang = None):
+def recursive_streaming(tags = None, follow = None, lang = None):
 	if tags == ['']: tags = None
 	if follow == ['']: follow = None
-	if sample_lang == ['']: sample_lang = None
-	if filter_lang == ['']: filter_lang = None
+	if lang == ['']: sample_lang = None
 	try:
 		print('Start streaming.')
-		if PARAMS['DEFAULT']['mode'] == 'filter':
-			logging.info('Start streaming with filters: ' + str(PARAMS['filter']['track']) + ', and following users: ' + str(PARAMS['filter']['follow']) + '. (' + PARAMS['filter']['lang'] + ')')
-			streamer.filter(follow = follow, track = tags, languages = filter_lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
-		if PARAMS['DEFAULT']['mode'] == 'sample':
-			logging.info('Start sample streaming. (' + str(PARAMS['sample']['lang']) + ')')
-			streamer.sample(languages = sample_lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
+		logging.info('Start streaming with filters: ' + str(PARAMS['filter']['track']) + ', and following users: ' + str(PARAMS['filter']['follow']) + '. (' + PARAMS['filter']['lang'] + ')')
+		streamer.filter(follow = follow, track = tags, languages = filter_lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
 	except KeyboardInterrupt:
 		print('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
 		logging.info('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
@@ -121,6 +116,6 @@ def recursive_streaming(tags = None, follow = None, sample_lang = None, filter_l
 		print("Stream stopped. Waiting " + str(disconnects) + " seconds before restarting.")
 		logging.exception("Stream stopped. Waiting " + str(disconnects) + " seconds before restarting.")
 		time.sleep(disconnects)
-		recursive_streaming(tags, follow, sample_lang, filter_lang)
+		recursive_streaming(tags, follow, lang)
 
-recursive_streaming(tags = PARAMS['filter']['track'].split(', '), follow = PARAMS['filter']['follow'].split(', '), sample_lang = PARAMS['sample']['lang'].split(', '), filter_lang = PARAMS['filter']['lang'].split(', '))
+recursive_streaming(tags = PARAMS['filter']['track'].split(', '), follow = PARAMS['filter']['follow'].split(', '), lang = PARAMS['filter']['lang'].split(', '))
