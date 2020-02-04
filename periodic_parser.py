@@ -1,16 +1,10 @@
 # Preparation
-import json, logging, re, csv, configparser
+import json, re, csv
 import os.path
 from datetime import date, timedelta
 from collections import Counter, OrderedDict
 from operator import itemgetter
 from nltk.corpus import stopwords 
-
-PARAMS = configparser.ConfigParser()
-PARAMS.read('config.ini')
-
-# Setting up log file
-logging.basicConfig(filename = PARAMS['DEFAULT']['parselog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
 
 # Get Date
 def getdate(offset = 0):
@@ -90,7 +84,7 @@ def normalize_counts(adjust, base, threshold, top = False):
 	return adjusted
 
 # Writing the updated list of words to csv
-def updatecsv(wordlist, file = PARAMS['DEFAULT']['updated_wordlist']):
+def updatecsv(wordlist, file):
 	if not os.path.isfile(file):
 		with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
 			writer = csv.writer(out_file)
