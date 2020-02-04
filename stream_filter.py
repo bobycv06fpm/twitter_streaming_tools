@@ -96,11 +96,11 @@ last_disc = time.time() - 7200
 def recursive_streaming(tags = None, follow = None, lang = None):
 	if tags == ['']: tags = None
 	if follow == ['']: follow = None
-	if lang == ['']: sample_lang = None
+	if lang == ['']: lang = None
 	try:
 		print('Start streaming.')
 		logging.info('Start streaming with filters: ' + str(PARAMS['filter']['track']) + ', and following users: ' + str(PARAMS['filter']['follow']) + '. (' + PARAMS['filter']['lang'] + ')')
-		streamer.filter(follow = follow, track = tags, languages = filter_lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
+		streamer.filter(follow = follow, track = tags, languages = lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
 	except KeyboardInterrupt:
 		print('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
 		logging.info('Manually stopped. ' + str(tweetNum) + ' tweets collected.')

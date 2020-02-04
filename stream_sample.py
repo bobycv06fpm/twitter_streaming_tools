@@ -94,11 +94,11 @@ last_disc = time.time() - 7200
 
 
 def recursive_streaming(lang = None):
-	if lang == ['']: filter_lang = None
+	if lang == ['']: lang = None
 	try:
 		print('Start streaming.')
 		logging.info('Start sample streaming. (' + str(PARAMS['sample']['lang']) + ')')
-		streamer.sample(languages = sample_lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
+		streamer.sample(languages = lang, encoding = 'utf8', filter_level = None, stall_warnings = True)
 	except KeyboardInterrupt:
 		print('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
 		logging.info('Manually stopped. ' + str(tweetNum) + ' tweets collected.')
