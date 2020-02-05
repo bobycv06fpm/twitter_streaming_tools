@@ -1,5 +1,5 @@
 # Preparation
-import json, re, csv, logging
+import json, re, csv, logging, pickle, configparser
 import os.path
 from datetime import date, timedelta
 from collections import Counter, OrderedDict
@@ -30,7 +30,7 @@ def file2text(infiles):
 			except Exception as e: 
 				logger.exception('Error in entry:' + str(i))
 	return texts
-	
+
 # Parse data for words
 def parsetweet(tweet):
 	if tweet['truncated']:
@@ -70,8 +70,14 @@ def totextlist(texts, subset = False):
 def count_out(textlist, outfile):
 	textlist = Counter(textlist)
 	with open(outfile, 'wb') as out_pickle:
-				pickle.dump(textlist, out_pickle)
+		pickle.dump(textlist, out_pickle)
 
+# Reading in freq dict
+def count_in(infile):
+	with open(infile, 'rb') as in_pickle:
+		freq_dict = pickle.load(in_pickle)
+	return freq_dict
+	
 # Normalize frequency of one text list by another
 def normalize_counts(adjust, base, threshold, top = False):
 	if isinstance(adjust, list):
