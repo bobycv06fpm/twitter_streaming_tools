@@ -7,7 +7,7 @@ PARAMS = configparser.ConfigParser()
 PARAMS.read('config.ini')
 
 # Setting up log file
-logging.basicConfig(filename = PARAMS['filter']['parselog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
+logging.basicConfig(filename = PARAMS['sample']['parselog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
 
 # Loading and parsing raw json file
 tweets = file2text(infiles = PARAMS['sample']['rawjson'])
