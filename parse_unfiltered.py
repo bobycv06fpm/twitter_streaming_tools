@@ -16,4 +16,7 @@ tweets = file2text(infiles = PARAMS['sample']['rawjson'])
 textlist = totextlist(texts = tweets, subset = False)
 
 # Outputting frequency dict as .pickle
-count_out(textlist, PARAMS['sample']['freq_dict'])
+count_out(textlist, outfile = PARAMS['sample']['freq_dict'])
+
+# Update config file
+updateconfig_sample()
