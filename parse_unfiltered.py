@@ -1,6 +1,19 @@
+# Preparation
 from periodic_parser import *
 import logging, configparser
 
-# Reading in configuration file
+# Reading in configuation
 PARAMS = configparser.ConfigParser()
 PARAMS.read('config.ini')
+
+# Setting up log file
+logging.basicConfig(filename = PARAMS['filter']['parselog'], filemode = 'a', format = '(%(asctime)s) %(levelname)s: %(message)s', level = logging.INFO)
+
+# Loading and parsing raw json file
+tweets = file2text(infiles = PARAMS['sample']['rawjson'])
+
+# Flattening tweets to text
+textlist = totextlist(texts = tweets, subset = False)
+
+# Outputting frequency dict as .pickle
+count_out(textlist, PARAMS['sample']['freq_dict'])
