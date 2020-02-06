@@ -98,7 +98,7 @@ def normalize_counts(adjust, base, threshold, top = False):
 	return adjusted
 
 # Writing the updated list of words to csv
-def updatecsv(wordlist, file):
+def updatecsv(wordlist, outfile):
 	if not os.path.isfile(file):
 		with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
 			writer = csv.writer(out_file)
