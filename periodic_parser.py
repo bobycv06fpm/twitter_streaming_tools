@@ -1,5 +1,5 @@
 # Preparation
-import json, re, csv, logging, pickle, configparser
+import json, re, csv, logging, pickle, configparser, math
 import os.path
 from datetime import date, timedelta
 from collections import Counter, OrderedDict
@@ -79,7 +79,7 @@ def count_in(infile):
 	return freq_dict
 	
 # Normalize frequency of one text list by another
-def normalize_counts(adjust, base, threshold, top = False):
+def normalize_counts(adjust, base, threshold):
 	if isinstance(adjust, list):
 		adjust = Counter(adjust)
 	if isinstance(base, list):
@@ -92,19 +92,30 @@ def normalize_counts(adjust, base, threshold, top = False):
 				base[s] = 1
 			adjusted[s] = adjust[s]/base[s]
 	
-	adjusted = sorted(adjusted.items(), key = itemgetter(1), reverse = True)
-	if top != False:
-		adjusted = adjusted[0:top]
 	return adjusted
+
+
+# Combining new tracks with base tracks
+def combine_newbase(new_track, base_track, total = 400):
+	for b in base_track:
+		new_track[b] = math.inf
+		
+	# Sort words by normalized freq; base tracks are always at top
+	new_track = sorted(new_track.items(), key = itemgetter(1), reverse = True)
+	# Take top 'total' words
+	new_track = new_track[0:total]
+	
+	return(new_track)
+
 
 # Writing the updated list of words to csv
 def updatecsv(wordlist, outfile):
-	if not os.path.isfile(file):
-		with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
+	if not os.path.isfile(outfile):
+		with open(outfile, 'a', encoding = 'utf-8', newline = '') as out_file:
 			writer = csv.writer(out_file)
 			writer.writerow(['string', 'score', 'date'])
 	datelabel = getdate()
-	with open(file, 'a', encoding = 'utf-8', newline = '') as out_file:
+	with open(outfile, 'a', encoding = 'utf-8', newline = '') as out_file:
 		writer = csv.writer(out_file)
 		for row in wordlist:
 			writer.writerow(row + (datelabel,))
@@ -122,10 +133,7 @@ def updateconfig_filter(new_track, offset = 1, old_config = 'config.ini', new_co
 	
 	# Format new tracks and combine with base tracks
 	new_track = [x[0] for x in new_track]
-	track_base = PARAMS['filter']['track_base'].split(spaced_comma)
-	new_track.extend(track_base)
-	new_track = list(set(new_track))
-	new_track = spaced_comma.join(new_track)	
+	new_track = spaced_comma.join(new_track)
 	
 	# Updating output files
 	output = 'tweets_' + datelabel + '.txt'
